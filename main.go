@@ -1,28 +1,17 @@
 package main
 
 import (
-	_ "go-ecommerce-app/config"
-
-	"github.com/gofiber/fiber/v2"
+	"go-ecommerce-app/config"
+	"go-ecommerce-app/internal/api"
+	"log"
 )
 
 func main() {
-	app := fiber.New()
+	cfg, err := config.SetupEnv()
 
-	//myWishlist := make(map[string]string)
-	//myWishlist["first"] = "Health"
-	//myWishlist["second"] = "100 Million Dollar"
-	//myWishlist["third"] = "Beautiful Wife"
-	//myWishlist["fourth"] = "Beautiful Wife"
-	//
-	//delete(myWishlist, "fourth")
-	//
-	//fmt.Printf("My wishlist is %v\n", myWishlist)
-
-	type Product struct {
-		Name  string
-		Price float64
+	if err != nil {
+		log.Fatalln("Config file is not loaded properly %v\n", err)
 	}
 
-	app.Listen(":9000")
+	api.StartServer(cfg)
 }
