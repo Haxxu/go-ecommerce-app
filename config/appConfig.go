@@ -9,6 +9,7 @@ import (
 type AppConfig struct {
 	ServerPort string
 	Dsn        string // Data source name
+	AppSecret  string
 }
 
 func SetupEnv() (cfg AppConfig, err error) {
@@ -26,5 +27,10 @@ func SetupEnv() (cfg AppConfig, err error) {
 		return AppConfig{}, errors.New("Environment variable DSN is not set")
 	}
 
-	return AppConfig{ServerPort: httpPort, Dsn: Dsn}, nil
+	appSecret := os.Getenv("APP_SECRET")
+	if len(appSecret) < 1 {
+		return AppConfig{}, errors.New("Environment variable APP_SECRET is not set")
+	}
+
+	return AppConfig{ServerPort: httpPort, Dsn: Dsn, AppSecret: appSecret}, nil
 }
