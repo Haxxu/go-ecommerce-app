@@ -139,3 +139,8 @@ func (a Auth) GetCurrentUser(ctx *fiber.Ctx) domain.User {
 
 	return user.(domain.User)
 }
+
+func (a Auth) GenerateCode() (int, error) {
+	return RandomNumbers(6)
+	return 0, nil
+}

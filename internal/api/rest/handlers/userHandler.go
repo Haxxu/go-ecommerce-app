@@ -93,14 +93,43 @@ func (h *UserHandler) Login(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) Verify(ctx *fiber.Ctx) error {
+	user := h.userService.Auth.GetCurrentUser(ctx)
+
+	// request
+	var req dto.VerificationCodeInput
+
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "verify failed; please provide valid inputs",
+		})
+	}
+
+	err := h.userService.VerifyCode(user.ID, req.Code)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"message": "verify success",
 	})
 }
 
 func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
+	user := h.userService.Auth.GetCurrentUser(ctx)
+
+	// create verification code and update to user profile in DB
+	code, err := h.userService.GetVerificationCode(user)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "unable to get verification code",
+		})
+	}
+
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"message": "get verification code success",
+		"data":    code,
 	})
 }
 
