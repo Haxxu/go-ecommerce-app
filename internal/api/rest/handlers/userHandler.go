@@ -121,7 +121,7 @@ func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
 	user := h.userService.Auth.GetCurrentUser(ctx)
 
 	// create verification code and update to user profile in DB
-	code, err := h.userService.GetVerificationCode(user)
+	err := h.userService.GetVerificationCode(user)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 			"message": "unable to get verification code",
@@ -130,7 +130,6 @@ func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"message": "get verification code success",
-		"data":    code,
 	})
 }
 
