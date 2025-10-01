@@ -2,16 +2,20 @@ package service
 
 import (
 	"errors"
+	"go-ecommerce-app/config"
 	"go-ecommerce-app/internal/domain"
 	"go-ecommerce-app/internal/dto"
 	"go-ecommerce-app/internal/helper"
 	"go-ecommerce-app/internal/repository"
+	"go-ecommerce-app/pkg/notification"
+	"strconv"
 	"time"
 )
 
 type UserService struct {
-	Repo repository.UserRepository
-	Auth helper.Auth
+	Repo   repository.UserRepository
+	Auth   helper.Auth
+	Config config.AppConfig
 }
 
 func (s UserService) findUserByEmail(email string) (*domain.User, error) {
@@ -77,7 +81,11 @@ func (s UserService) GetVerificationCode(u domain.User) (int, error) {
 		return 0, errors.New("unable to update verification code")
 	}
 
+	user, _ = s.Repo.FindUserById(u.ID)
+
 	// send SMS
+	notificationClient := notification.NewNotificationClient(s.Config)
+	notificationClient.SendSMS(user.Phone, strconv.Itoa(code))
 
 	// return verification code
 	return code, nil
